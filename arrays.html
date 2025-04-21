@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Transactions & Grouping</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h2 {
+      color: #333;
+    }
+    textarea {
+      width: 100%;
+      height: 100px;
+      font-family: monospace;
+      margin-bottom: 10px;
+    }
+    button {
+      margin: 10px 0;
+      padding: 10px 20px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    pre {
+      background: #f4f4f4;
+      padding: 10px;
+      white-space: pre-wrap;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🧮 Process Transactions</h2>
+  <p>Enter transactions (JSON format):</p>
+  <textarea id="transactionsInput">[
+  { "type": "deposit", "amount": 1000 },
+  { "type": "withdrawal", "amount": 200 },
+  { "type": "deposit", "amount": 500 }
+]</textarea>
+  <button onclick="handleProcessTransactions()">Process Transactions</button>
+  <pre id="transactionsResult"></pre>
+
+  <hr>
+
+  <h2>📦 Group by Category</h2>
+  <p>Enter items (JSON format):</p>
+  <textarea id="itemsInput">[
+  { "name": "Laptop", "category": "Electronics", "price": 1200 },
+  { "name": "T-Shirt", "category": "Apparel", "price": 25 },
+  { "name": "Mouse", "category": "Electronics", "price": 30 }
+]</textarea>
+  <p>Category Key: <input type="text" id="categoryKey" value="category" /></p>
+  <button onclick="handleGroupByCategory()">Group Items</button>
+  <pre id="groupedResult"></pre>
+
+  <script>
+    function processTransactions(transactions) {
+      let balance = 0, totalDeposits = 0, totalWithdrawals = 0;
+
+      for (const tx of transactions) {
+        if (tx.type === 'deposit') {
+          balance += tx.amount;
+          totalDeposits += tx.amount;
+        } else if (tx.type === 'withdrawal') {
+          balance -= tx.amount;
+          totalWithdrawals += tx.amount;
+        }
+      }
+
+      return {
+        finalBalance: balance,
+        totalDeposits,
+        totalWithdrawals
+      };
+    }
+
+    function groupByCategory(items, categoryKey) {
+      const grouped = {};
+      for (const item of items) {
+        const key = item[categoryKey];
+        if (!grouped[key]) {
+          grouped[key] = [];
+        }
+        grouped[key].push(item);
+      }
+      return grouped;
+    }
+
+    function handleProcessTransactions() {
+      try {
+        const transactions = JSON.parse(document.getElementById("transactionsInput").value);
+        const result = processTransactions(transactions);
+        document.getElementById("transactionsResult").textContent = JSON.stringify(result, null, 2);
+      } catch (err) {
+        document.getElementById("transactionsResult").textContent = "Invalid JSON input.";
+      }
+    }
+
+    function handleGroupByCategory() {
+      try {
+        const items = JSON.parse(document.getElementById("itemsInput").value);
+        const key = document.getElementById("categoryKey").value.trim();
+        const grouped = groupByCategory(items, key);
+        document.getElementById("groupedResult").textContent = JSON.stringify(grouped, null, 2);
+      } catch (err) {
+        document.getElementById("groupedResult").textContent = "Invalid JSON input.";
+      }
+    }
+  </script>
+
+</body>
+</html>
